@@ -1,0 +1,300 @@
+#include "StudyScene.h"
+#include "DX2DClasses/Driect2DFramework.h"
+#include "DX2DClasses/SingletonRenderTarget.h"
+#include "DX2DClasses/ColorBrush.h"
+#include "DX2DClasses/Vector2.h"
+#include "DX2DClasses/Image.h"
+#include "DX2DClasses/InputManager.h"
+#include "DX2DClasses/CollisionCheck.h"
+#include "DX2DClasses/ColorBrushPalettet.h"
+#include "DX2DClasses/DebugHelper.h"
+#include "DX2DClasses/GameObject.h"
+#include "DX2DClasses/Colliders.h"
+#include <conio.h>
+#include <iostream>
+#include <string>
+
+using namespace DX2DClasses;
+
+void RemoveGameObjectIndexOf(size_t index);
+
+StudyScene::StudyScene()
+{
+	//Initialize();
+}
+
+StudyScene::~StudyScene()
+{
+	//Release();
+}
+
+void StudyScene::Initialize(HWND hWnd, CDriect2DFramwork* pDX2DFramework)
+{
+	
+	ID2D1HwndRenderTarget* pRenderTarget = CSingletonRenderTarget::GetRenderTarget();
+
+	m_pColorBrushPalettet = new CColorBrushPalettet();
+	m_pColorBrushPalettet->Initialize(pRenderTarget);
+	
+	m_fPlayerSpeed = 15;
+
+	m_pPlayer = new CImage(pDX2DFramework->GetD2DRenderTarget(), pDX2DFramework->GetImagingFactory(), 6);
+	m_pPlayer->ManualLoadImage(hWnd, L"Images\\player%02d.png");
+
+	m_pBulletImage = new CImage(pDX2DFramework->GetD2DRenderTarget(), pDX2DFramework->GetImagingFactory(), 1);
+	m_pBulletImage->ManualLoadImage(hWnd, L"Images\\death%02d.png");
+
+	m_pPlayerObject = new CGameObject();
+	m_pPlayerObject->Initialize(m_pPlayer, true);
+	//m_pPlayerObject->GetTransform().SetScale(DX2DClasses::SVector2(0.5, 0.5));
+	m_pPlayerObject->GetTransform().SetTranslate(DX2DClasses::SVector2(275, 500));
+
+	m_pPlayerBoxCollider = new CBoxCollider();
+	m_pPlayerBoxCollider->InitCollider(m_pPlayerObject->GetTransformPtr(), SVector2(), m_pPlayer->GetImageSize());
+	
+	m_pNumberImage = new CImage(pDX2DFramework->GetD2DRenderTarget(), pDX2DFramework->GetImagingFactory(), 10);
+	m_pNumberImage->ManualLoadImage(hWnd, L"Images\\Number%d.png");
+
+	m_pNumberObject0 = new CGameObject();
+	m_pNumberObject0->Initialize(m_pNumberImage, true);
+	m_pNumberObject0->GetTransform().SetTranslate(DX2DClasses::SVector2(100, 10));
+
+	m_pNumberObject1 = new CGameObject();
+	m_pNumberObject1->Initialize(m_pNumberImage, true);
+	m_pNumberObject1->GetTransform().SetTranslate(DX2DClasses::SVector2(115, 10));
+
+	m_pGameOverImage = new CImage(pDX2DFramework->GetD2DRenderTarget(), pDX2DFramework->GetImagingFactory(), 1);
+	m_pGameOverImage->ManualLoadImage(hWnd, L"Images\\GameOver.png");
+
+	m_pGameOverObject = new CGameObject();
+	m_pGameOverObject->Initialize(m_pGameOverImage, true);
+	m_pGameOverObject->GetTransform().SetTranslate(DX2DClasses::SVector2(120, 225));
+	m_pGameOverObject->SetActive(false);
+
+	m_pStartImage = new CImage(pDX2DFramework->GetD2DRenderTarget(), pDX2DFramework->GetImagingFactory(), 1);
+	m_pStartImage->ManualLoadImage(hWnd, L"Images\\Start.png");
+
+	m_pStartObject = new CGameObject();
+	m_pStartObject->Initialize(m_pStartImage, true);
+	m_pStartObject->GetTransform().SetTranslate(DX2DClasses::SVector2(130, 255));
+
+	m_pScoreImage = new CImage(pDX2DFramework->GetD2DRenderTarget(), pDX2DFramework->GetImagingFactory(), 1);
+	m_pScoreImage->ManualLoadImage(hWnd, L"Images\\Score.png");
+
+	m_pScoreObject = new CGameObject();
+	m_pScoreObject->Initialize(m_pScoreImage, true);
+	m_pScoreObject->GetTransform().SetTranslate(DX2DClasses::SVector2(10, 10));
+
+
+	CDebugHelper::LogConsole("\n");
+	CDebugHelper::LogConsole("  _____   ____  _____   _____ ______ \n");
+	CDebugHelper::LogConsole(" |  __ \\ / __ \\|  __ \\ / ____|  ____|\n");
+	CDebugHelper::LogConsole(" | |  | | |  | | |  | | |  __| |__   \n");
+	CDebugHelper::LogConsole(" | |  | | |  | | |  | | | |_ |  __|  \n");
+	CDebugHelper::LogConsole(" | |__| | |__| | |__| | |__| | |____ \n");
+	CDebugHelper::LogConsole(" |_____/ \\____/|_____/ \\_____|______|\n\n");
+	CDebugHelper::LogConsole("[ Press SPACEBAR to Start Game ]\n");
+}
+
+void StudyScene::Release()
+{
+	m_pPlayerObject->Release();
+	delete m_pPlayerObject;
+	delete m_pPlayerBoxCollider;
+	delete m_pBulletImage;
+	delete m_pPlayer;
+
+	m_pColorBrushPalettet->Release();
+	delete m_pColorBrushPalettet;
+
+	for (auto col : m_pRectColliders) {
+		delete col;
+	}
+	for (auto obj : m_pGameObjects) {
+		obj->Release();
+		delete obj;
+	}
+}
+
+void StudyScene::Update()
+{
+	//DX2DClasses::CTransform playerTransform = m_pPlayerObject->GetTransform();
+
+
+	if (isPlayerAlive) {
+		CTransform& cTrnasform = m_pPlayerObject->GetTransform();
+		SVector2 vPos = cTrnasform.GetTranslate();
+		SVector2 vSize = m_pPlayerObject->GetImage()->GetImageSize();
+		SVector2 vScale = cTrnasform.GetScale();
+		//CDebugHelper::LogConsole("(%3.f, %3.f)\n", vPos.x, vPos.y);
+
+		bool isRightPressed = CInputManager::GetAsyncKeyStatePress(VK_RIGHT);
+		bool isLeftPressed = CInputManager::GetAsyncKeyStatePress(VK_LEFT);
+		bool isUpPressed = CInputManager::GetAsyncKeyStatePress(VK_UP);
+		bool isDownPressed = CInputManager::GetAsyncKeyStatePress(VK_DOWN);
+
+		if (isRightPressed && vPos.x < 540) {
+			cTrnasform.Translate(SVector2::right() * m_fPlayerSpeed);//vPlayerPos.x -= fPlayerSpeed;
+		}
+		if (isLeftPressed && vPos.x > 0) {
+			cTrnasform.Translate(SVector2::left() * m_fPlayerSpeed);//vPlayerPos.x -= fPlayerSpeed;
+		}
+		if (isDownPressed && vPos.y < 500) {
+			cTrnasform.Translate(SVector2::down() * m_fPlayerSpeed);//vPlayerPos.x -= fPlayerSpeed;
+		}
+		if (isUpPressed && vPos.y > 10) {
+			cTrnasform.Translate(SVector2::up() * m_fPlayerSpeed);//vPlayerPos.x -= fPlayerSpeed;
+		}
+
+		/*
+		if (CInputManager::GetAsyncKeyStatePress(VK_RIGHT))
+			vPlayerPos.x += fPlayerSpeed; //vPlayerPos = vPlayerPos + SVector2::right() * fPlayerSpeed;
+		if (CInputManager::GetAsyncKeyStatePress(VK_LEFT))
+			vPlayerPos = vPlayerPos + SVector2::left() * fPlayerSpeed;//vPlayerPos.x -= fPlayerSpeed;
+		if (CInputManager::GetAsyncKeyStatePress(VK_DOWN))
+			vPlayerPos = vPlayerPos + SVector2::down() * fPlayerSpeed;//vPlayerPos.y += fPlayerSpeed;
+		if (CInputManager::GetAsyncKeyStatePress(VK_UP))
+			vPlayerPos.y -= fPlayerSpeed;//vPlayerPos = vPlayerPos + SVector2::up() * fPlayerSpeed;
+		*/
+
+
+		if (isRightPressed || isLeftPressed || isUpPressed || isDownPressed) {
+			m_pPlayerObject->Update();
+		}
+		else {
+			m_pPlayerObject->GetAnimator()->SetFrame();
+		}
+	}
+
+	if(isPlayerAlive) {
+
+		std::random_device rd;
+		std::mt19937 gen(rd());
+		std::uniform_int_distribution<> dis(1, 550);
+
+		if (m_pGameObjects.size() < 25) {
+
+			try {
+				CGameObject* bulletObject = new CGameObject();
+				bulletObject->Initialize(m_pBulletImage, true);
+				bulletObject->GetTransform().SetTranslate(DX2DClasses::SVector2(dis(gen), 0));
+				CRectCollider* bulletCollider = new CRectCollider();
+				bulletCollider->InitCollider(bulletObject->GetTransformPtr(), SVector2(), m_pBulletImage->GetImageSize());
+
+				m_pGameObjects.push_back(bulletObject);
+				m_pRectColliders.push_back(bulletCollider);
+			}
+			catch (const std::exception& e) {
+				std::cout << "Caught an exception: " << e.what() << std::endl;
+				CDebugHelper::LogConsole("Bug %s", e.what());
+			}
+		}
+
+		for (CGameObject* gameObject : m_pGameObjects)
+		{
+			gameObject->GetTransform().Translate(SVector2::down() * 25);
+		}
+
+		/*
+		int dist = -1;
+		for (auto it = m_pGameObjects.begin(); it != m_pGameObjects.end(); ++it) {
+			if ((*it)->GetTransform().GetTranslate().y > 550) {
+				dist = std::distance(m_pGameObjects.begin(), it);
+				break;
+			}
+		}*/
+
+		for (auto go : m_pGameObjects) {
+			if (go->GetTransform().GetTranslate().y > 550) {
+				go->GetTransform().SetTranslate(DX2DClasses::SVector2(dis(gen), 0));
+				++score;
+				CDebugHelper::LogConsole("Score: %d\n", score);
+
+				m_pNumberObject0->GetAnimator()->SetFrame(score / 10);
+				m_pNumberObject1->GetAnimator()->SetFrame(score % 10);
+			}
+		}
+		/*
+		if (dist != -1) {
+			CRectCollider* rect = m_pRectColliders.at(dist);
+			CGameObject* gameObject = m_pGameObjects.at(dist);
+			m_pRectColliders.erase(m_pRectColliders.begin() + dist);
+			m_pGameObjects.erase(m_pGameObjects.begin() + dist);
+			delete rect;
+			gameObject->Release();
+			delete gameObject;
+			dist = -1;
+		}*/
+	}
+
+	if (!isPlayerAlive && CInputManager::GetAsyncKeyStatePress(VK_SPACE)) {
+		m_pGameOverObject->SetActive(false);
+		m_pStartObject->SetActive(false);
+		CDebugHelper::LogConsole("\nGame Restarted\n");
+		CDebugHelper::LogConsole("\n[ !!!SURVIVE AS LONG AS YOU CAN!!! ]\n");
+
+		for (CRectCollider* rect : m_pRectColliders) {
+			delete rect;
+		}
+		m_pRectColliders.clear();
+		for (CGameObject* gameObject : m_pGameObjects) {
+			gameObject->Release();
+			delete gameObject;
+		}
+		m_pGameObjects.clear();
+		score = 0;
+		isPlayerAlive = true;
+		m_pPlayerObject->GetTransform().SetTranslate(DX2DClasses::SVector2(275, 500));
+
+		m_pNumberObject0->GetAnimator()->SetFrame(score / 10);
+		m_pNumberObject1->GetAnimator()->SetFrame(score % 10);
+	}
+}
+
+void StudyScene::Draw()
+{
+	ID2D1HwndRenderTarget* pRenderTarget = CSingletonRenderTarget::GetRenderTarget();
+	m_pPlayerObject->Draw();
+	ColliderDraw();
+	for (CGameObject* gameObject : m_pGameObjects)
+	{
+		if(gameObject->GetActive())
+			gameObject->Draw();
+	}
+	m_pNumberObject0->Draw();
+	m_pNumberObject1->Draw();
+	m_pGameOverObject->Draw();
+	m_pScoreObject->Draw();
+	m_pStartObject->Draw();
+}
+
+void StudyScene::ColliderDraw() {
+	CColorBrush* pRedBrush = m_pColorBrushPalettet->GetBrushClass(CColorBrushPalettet::RED);
+	m_pPlayerBoxCollider->DrawOutline(pRedBrush);
+
+	if (isPlayerAlive) {
+		int dist = -1;
+		for (auto it = m_pRectColliders.begin(); it != m_pRectColliders.end(); ++it) {
+			if (m_pPlayerBoxCollider->ToRect(*it)) {
+				dist = std::distance(m_pRectColliders.begin(), it);
+				break;
+			}
+		}
+
+		if (dist != -1) {
+			dist = -1;
+			isPlayerAlive = false;
+			m_pGameOverObject->SetActive(true);
+			CDebugHelper::LogConsole("################# You Dead!! #################\n");
+			CDebugHelper::LogConsole("[ Score : %d ]\n", score);
+			if (score > highScore) {
+				highScore = score;
+				CDebugHelper::LogConsole("!!!!!!!!! New High Score !!!!!!!!!\n");
+				CDebugHelper::LogConsole("!!!!!!!!! New High Score !!!!!!!!!\n");
+				CDebugHelper::LogConsole("!!!!!!!!! New High Score !!!!!!!!!\n");
+			}
+			CDebugHelper::LogConsole("[ High Score : %d ]\n", highScore);
+			CDebugHelper::LogConsole("[ Press SPACEBAR to Restart ]\n", score);
+		}
+	}
+}
