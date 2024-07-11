@@ -3,6 +3,7 @@
 #include "DX2DClasses/Vector2.h"
 #include <vector>
 #include <random>
+#include <iostream>
 
 namespace DX2DClasses
 {
@@ -19,33 +20,26 @@ namespace DX2DClasses
 		int score = 0;
 		bool isPlayerAlive;
 
-		CColorBrushPalettet* m_pColorBrushPalettet;
+		std::unique_ptr<CColorBrushPalettet> m_pColorBrushPalettet;
 
-		CImage* m_pGround;
-		CGameObject* m_pGroundObject;
-		CBoxCollider* m_pGroundBoxCollider;
-		CRectCollider* m_pGroundRectCollider;
+		std::unique_ptr<CImage> m_pPlayer;
+		std::unique_ptr<CGameObject> m_pPlayerObject;
+		std::unique_ptr<CBoxCollider> m_pPlayerBoxCollider;
 
-		CImage* m_pPlayer;
-		CGameObject* m_pPlayerObject;
-		CBoxCollider* m_pPlayerBoxCollider;
+		std::unique_ptr<CImage> m_pBulletImage;
 
-		CImage* m_pBulletImage;
-		CGameObject* m_pBulletObject;
-		CRectCollider* m_pBulletCollider;
+		std::shared_ptr<CImage> m_pNumberImage;
+		std::unique_ptr<CGameObject> m_pNumberObject0;
+		std::unique_ptr<CGameObject> m_pNumberObject1;
 
-		CImage* m_pNumberImage;
-		CGameObject* m_pNumberObject0;
-		CGameObject* m_pNumberObject1;
+		std::unique_ptr<CImage> m_pScoreImage;
+		std::unique_ptr<CGameObject> m_pScoreObject;
 
-		CImage* m_pScoreImage;
-		CGameObject* m_pScoreObject;
+		std::unique_ptr<CImage> m_pStartImage;
+		std::unique_ptr<CGameObject> m_pStartObject;
 
-		CImage* m_pStartImage;
-		CGameObject* m_pStartObject;
-
-		CImage* m_pGameOverImage;
-		CGameObject* m_pGameOverObject;
+		std::unique_ptr<CImage> m_pGameOverImage;
+		std::unique_ptr<CGameObject> m_pGameOverObject;
 
 		SVector2 m_vPos;
 

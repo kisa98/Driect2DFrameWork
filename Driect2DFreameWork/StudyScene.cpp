@@ -14,6 +14,11 @@
 #include <iostream>
 #include <string>
 
+#define _CRTDBG_MAP_ALLOC
+#include <stdlib.h>
+#include <crtdbg.h>
+
+
 using namespace DX2DClasses;
 
 void RemoveGameObjectIndexOf(size_t index);
@@ -30,60 +35,60 @@ StudyScene::~StudyScene()
 
 void StudyScene::Initialize(HWND hWnd, CDriect2DFramwork* pDX2DFramework)
 {
-	
 	ID2D1HwndRenderTarget* pRenderTarget = CSingletonRenderTarget::GetRenderTarget();
 
-	m_pColorBrushPalettet = new CColorBrushPalettet();
+	m_pColorBrushPalettet = std::unique_ptr<CColorBrushPalettet>(new CColorBrushPalettet());
 	m_pColorBrushPalettet->Initialize(pRenderTarget);
 	
 	m_fPlayerSpeed = 15;
+	m_pPlayer = std::unique_ptr<CImage>(new CImage(pDX2DFramework->GetD2DRenderTarget(), pDX2DFramework->GetImagingFactory(), 6));
+	m_pPlayer.get()->ManualLoadImage(hWnd, L"Images\\player%02d.png");
 
-	m_pPlayer = new CImage(pDX2DFramework->GetD2DRenderTarget(), pDX2DFramework->GetImagingFactory(), 6);
-	m_pPlayer->ManualLoadImage(hWnd, L"Images\\player%02d.png");
-
-	m_pBulletImage = new CImage(pDX2DFramework->GetD2DRenderTarget(), pDX2DFramework->GetImagingFactory(), 1);
+	m_pBulletImage = std::unique_ptr<CImage>(new CImage(pDX2DFramework->GetD2DRenderTarget(), pDX2DFramework->GetImagingFactory(), 1));
 	m_pBulletImage->ManualLoadImage(hWnd, L"Images\\death%02d.png");
 
-	m_pPlayerObject = new CGameObject();
-	m_pPlayerObject->Initialize(m_pPlayer, true);
+	m_pPlayerObject = std::unique_ptr<CGameObject>(new CGameObject());
+	m_pPlayerObject->Initialize(m_pPlayer.get(), true);
 	//m_pPlayerObject->GetTransform().SetScale(DX2DClasses::SVector2(0.5, 0.5));
 	m_pPlayerObject->GetTransform().SetTranslate(DX2DClasses::SVector2(275, 500));
 
-	m_pPlayerBoxCollider = new CBoxCollider();
+	m_pPlayerBoxCollider = std::unique_ptr<CBoxCollider>(new CBoxCollider());
 	m_pPlayerBoxCollider->InitCollider(m_pPlayerObject->GetTransformPtr(), SVector2(), m_pPlayer->GetImageSize());
 	
-	m_pNumberImage = new CImage(pDX2DFramework->GetD2DRenderTarget(), pDX2DFramework->GetImagingFactory(), 10);
+	m_pNumberImage = std::shared_ptr<CImage>(new CImage(pDX2DFramework->GetD2DRenderTarget(), pDX2DFramework->GetImagingFactory(), 10));
 	m_pNumberImage->ManualLoadImage(hWnd, L"Images\\Number%d.png");
 
-	m_pNumberObject0 = new CGameObject();
-	m_pNumberObject0->Initialize(m_pNumberImage, true);
+	m_pNumberObject0 = std::unique_ptr<CGameObject>(new CGameObject());
+	m_pNumberObject0->Initialize(m_pNumberImage.get(), true);
 	m_pNumberObject0->GetTransform().SetTranslate(DX2DClasses::SVector2(100, 10));
 
-	m_pNumberObject1 = new CGameObject();
-	m_pNumberObject1->Initialize(m_pNumberImage, true);
+	m_pNumberObject1 = std::unique_ptr<CGameObject>(new CGameObject());
+	m_pNumberObject1->Initialize(m_pNumberImage.get(), true);
 	m_pNumberObject1->GetTransform().SetTranslate(DX2DClasses::SVector2(115, 10));
 
-	m_pGameOverImage = new CImage(pDX2DFramework->GetD2DRenderTarget(), pDX2DFramework->GetImagingFactory(), 1);
+	m_pGameOverImage = std::unique_ptr<CImage>(new CImage(pDX2DFramework->GetD2DRenderTarget(), pDX2DFramework->GetImagingFactory(), 1));
 	m_pGameOverImage->ManualLoadImage(hWnd, L"Images\\GameOver.png");
 
-	m_pGameOverObject = new CGameObject();
-	m_pGameOverObject->Initialize(m_pGameOverImage, true);
+	m_pGameOverObject = std::unique_ptr<CGameObject>(new CGameObject());
+	m_pGameOverObject->Initialize(m_pGameOverImage.get(), true);
 	m_pGameOverObject->GetTransform().SetTranslate(DX2DClasses::SVector2(120, 225));
 	m_pGameOverObject->SetActive(false);
 
-	m_pStartImage = new CImage(pDX2DFramework->GetD2DRenderTarget(), pDX2DFramework->GetImagingFactory(), 1);
+	m_pStartImage = std::unique_ptr<CImage>(new CImage(pDX2DFramework->GetD2DRenderTarget(), pDX2DFramework->GetImagingFactory(), 1));
 	m_pStartImage->ManualLoadImage(hWnd, L"Images\\Start.png");
 
-	m_pStartObject = new CGameObject();
-	m_pStartObject->Initialize(m_pStartImage, true);
+	m_pStartObject = std::unique_ptr<CGameObject>(new CGameObject());
+	m_pStartObject->Initialize(m_pStartImage.get(), true);
 	m_pStartObject->GetTransform().SetTranslate(DX2DClasses::SVector2(130, 255));
 
-	m_pScoreImage = new CImage(pDX2DFramework->GetD2DRenderTarget(), pDX2DFramework->GetImagingFactory(), 1);
+	m_pScoreImage = std::unique_ptr<CImage>(new CImage(pDX2DFramework->GetD2DRenderTarget(), pDX2DFramework->GetImagingFactory(), 1));
 	m_pScoreImage->ManualLoadImage(hWnd, L"Images\\Score.png");
 
-	m_pScoreObject = new CGameObject();
-	m_pScoreObject->Initialize(m_pScoreImage, true);
+	m_pScoreObject = std::unique_ptr<CGameObject>(new CGameObject());
+	m_pScoreObject->Initialize(m_pScoreImage.get(), true);
 	m_pScoreObject->GetTransform().SetTranslate(DX2DClasses::SVector2(10, 10));
+
+
 
 
 	CDebugHelper::LogConsole("\n");
@@ -99,13 +104,13 @@ void StudyScene::Initialize(HWND hWnd, CDriect2DFramwork* pDX2DFramework)
 void StudyScene::Release()
 {
 	m_pPlayerObject->Release();
-	delete m_pPlayerObject;
-	delete m_pPlayerBoxCollider;
-	delete m_pBulletImage;
-	delete m_pPlayer;
+	m_pPlayerObject.release();
+	m_pPlayerBoxCollider.release();
+	m_pBulletImage.release();
+	m_pPlayer.release();
 
 	m_pColorBrushPalettet->Release();
-	delete m_pColorBrushPalettet;
+	m_pColorBrushPalettet.release();
 
 	for (auto col : m_pRectColliders) {
 		delete col;
@@ -114,6 +119,9 @@ void StudyScene::Release()
 		obj->Release();
 		delete obj;
 	}
+
+	_CrtSetReportMode(_CRT_WARN, _CRTDBG_MODE_DEBUG);
+	_CrtDumpMemoryLeaks();
 }
 
 void StudyScene::Update()
@@ -167,16 +175,18 @@ void StudyScene::Update()
 	}
 
 	if(isPlayerAlive) {
+		for (CGameObject* gameObject : m_pGameObjects)
+		{
+			gameObject->GetTransform().Translate(SVector2::down() * 25);
+		}
 
 		std::random_device rd;
 		std::mt19937 gen(rd());
 		std::uniform_int_distribution<> dis(1, 550);
-
 		if (m_pGameObjects.size() < 25) {
-
 			try {
 				CGameObject* bulletObject = new CGameObject();
-				bulletObject->Initialize(m_pBulletImage, true);
+				bulletObject->Initialize(m_pBulletImage.get(), true);
 				bulletObject->GetTransform().SetTranslate(DX2DClasses::SVector2(dis(gen), 0));
 				CRectCollider* bulletCollider = new CRectCollider();
 				bulletCollider->InitCollider(bulletObject->GetTransformPtr(), SVector2(), m_pBulletImage->GetImageSize());
@@ -188,11 +198,6 @@ void StudyScene::Update()
 				std::cout << "Caught an exception: " << e.what() << std::endl;
 				CDebugHelper::LogConsole("Bug %s", e.what());
 			}
-		}
-
-		for (CGameObject* gameObject : m_pGameObjects)
-		{
-			gameObject->GetTransform().Translate(SVector2::down() * 25);
 		}
 
 		/*
