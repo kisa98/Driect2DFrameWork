@@ -14,7 +14,7 @@ namespace DX2DClasses
 	class CColorBrush;
 	class CColorBrushPalettet;
 
-	class StudyScene : public ISceneManager
+	class BulletGame : public ISceneManager
 	{
 		int highScore = 0;
 		int score = 0;
@@ -48,8 +48,8 @@ namespace DX2DClasses
 		std::vector<CRectCollider*> m_pRectColliders;
 	public:
 		float m_fPlayerSpeed;
-		StudyScene();
-		~StudyScene();
+		BulletGame();
+		~BulletGame();
 
 		void Initialize(HWND hWnd, CDriect2DFramwork* pDX2DFramework) override; //초기화
 		void Release() override; //동적객체 제거

@@ -75,7 +75,7 @@
     <ClCompile Include="DX2DClasses\Matrix3.cpp">
       <Filter>소스 파일\DX2DClasses</Filter>
     </ClCompile>
-    <ClCompile Include="StudyScene.cpp">
+    <ClCompile Include="BulletGame.cpp">
       <Filter>소스 파일\UserDefine</Filter>
     </ClCompile>
   </ItemGroup>
@@ -146,7 +146,7 @@
     <ClInclude Include="DX2DClasses\UtilityDefine.h">
       <Filter>소스 파일\DX2DClasses</Filter>
     </ClInclude>
-    <ClInclude Include="StudyScene.h">
+    <ClInclude Include="BulletGame.h">
       <Filter>소스 파일\UserDefine</Filter>
     </ClInclude>
   </ItemGroup>

@@ -140,7 +140,7 @@
     <ClCompile Include="DX2DClasses\ColorBrush.cpp" />
     <ClCompile Include="DX2DClasses\SingletonRenderTarget.cpp" />
     <ClCompile Include="DX2DClasses\Vector2.cpp" />
-    <ClCompile Include="StudyScene.cpp" />
+    <ClCompile Include="BulletGame.cpp" />
     <ClCompile Include="TestScene.cpp" />
     <ClCompile Include="MoveSampleScene.cpp" />
     <ClCompile Include="stdafx.cpp" />
@@ -163,7 +163,7 @@
     <ClInclude Include="DX2DClasses\SceneManager.h" />
     <ClInclude Include="DX2DClasses\SingletonRenderTarget.h" />
     <ClInclude Include="DX2DClasses\Vector2.h" />
-    <ClInclude Include="StudyScene.h" />
+    <ClInclude Include="BulletGame.h" />
     <ClInclude Include="TestScene.h" />
     <ClInclude Include="Resource.h" />
     <ClInclude Include="MoveSampleScene.h" />

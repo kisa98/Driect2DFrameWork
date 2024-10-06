@@ -1,4 +1,4 @@
-#include "StudyScene.h"
+#include "BulletGame.h"
 #include "DX2DClasses/Driect2DFramework.h"
 #include "DX2DClasses/SingletonRenderTarget.h"
 #include "DX2DClasses/ColorBrush.h"
@@ -23,17 +23,17 @@ using namespace DX2DClasses;
 
 void RemoveGameObjectIndexOf(size_t index);
 
-StudyScene::StudyScene()
+BulletGame::BulletGame()
 {
 	//Initialize();
 }
 
-StudyScene::~StudyScene()
+BulletGame::~BulletGame()
 {
 	//Release();
 }
 
-void StudyScene::Initialize(HWND hWnd, CDriect2DFramwork* pDX2DFramework)
+void BulletGame::Initialize(HWND hWnd, CDriect2DFramwork* pDX2DFramework)
 {
 	ID2D1HwndRenderTarget* pRenderTarget = CSingletonRenderTarget::GetRenderTarget();
 
@@ -101,7 +101,7 @@ void StudyScene::Initialize(HWND hWnd, CDriect2DFramwork* pDX2DFramework)
 	CDebugHelper::LogConsole("[ Press SPACEBAR to Start Game ]\n");
 }
 
-void StudyScene::Release()
+void BulletGame::Release()
 {
 	m_pPlayerObject->Release();
 	m_pPlayerObject.release();
@@ -124,7 +124,7 @@ void StudyScene::Release()
 	_CrtDumpMemoryLeaks();
 }
 
-void StudyScene::Update()
+void BulletGame::Update()
 {
 	//DX2DClasses::CTransform playerTransform = m_pPlayerObject->GetTransform();
 
@@ -256,7 +256,7 @@ void StudyScene::Update()
 	}
 }
 
-void StudyScene::Draw()
+void BulletGame::Draw()
 {
 	ID2D1HwndRenderTarget* pRenderTarget = CSingletonRenderTarget::GetRenderTarget();
 	m_pPlayerObject->Draw();
@@ -273,7 +273,7 @@ void StudyScene::Draw()
 	m_pStartObject->Draw();
 }
 
-void StudyScene::ColliderDraw() {
+void BulletGame::ColliderDraw() {
 	CColorBrush* pRedBrush = m_pColorBrushPalettet->GetBrushClass(CColorBrushPalettet::RED);
 	m_pPlayerBoxCollider->DrawOutline(pRedBrush);
 

@@ -113,11 +113,11 @@
     </TypeIdentifier>
     <Lollipop Position="0.2" Collapsed="true" />
   </Class>
-  <Class Name="DX2DClasses::StudyScene" Collapsed="true" BaseTypeListCollapsed="true">
+  <Class Name="DX2DClasses::BulletGame" Collapsed="true" BaseTypeListCollapsed="true">
     <Position X="12.75" Y="3.5" Width="1.5" />
     <TypeIdentifier>
-      <HashCode>GEQAAAMQAEABAwgISAAKQQAIIQAERGAAAACEhRABAAA=</HashCode>
-      <FileName>StudyScene.h</FileName>
+      <HashCode>EEQAAAEQAEABAwgIQAAKCQAAIQAERGAAAAAMhRAAAAA=</HashCode>
+      <FileName>BulletGame.h</FileName>
     </TypeIdentifier>
     <Lollipop Position="0.2" Collapsed="true" />
   </Class>
