@@ -9,9 +9,8 @@
 - C++ 프로그래밍 기술 향상
 
 ## 프로젝트 구조
-> main.cpp
-> ISceneManager.h (Scene Interface)
-> BulletGame.h BulletGame.cpp
+> main.cpp  
+> ISceneManager.h (Scene Interface)  
+> BulletGame.h BulletGame.cpp  
 > DX2DClasses (Directory)
 
-## 
