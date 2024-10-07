@@ -20,6 +20,8 @@ namespace DX2DClasses
 		int score = 0;
 		bool isPlayerAlive;
 
+		int bulletIndex = 0;
+
 		std::unique_ptr<CColorBrushPalettet> m_pColorBrushPalettet;
 
 		std::unique_ptr<CImage> m_pPlayer;

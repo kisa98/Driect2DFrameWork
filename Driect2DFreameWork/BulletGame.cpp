@@ -39,7 +39,7 @@ void BulletGame::Initialize(HWND hWnd, CDriect2DFramwork* pDX2DFramework)
 
 	m_pColorBrushPalettet = std::unique_ptr<CColorBrushPalettet>(new CColorBrushPalettet());
 	m_pColorBrushPalettet->Initialize(pRenderTarget);
-	
+
 	m_fPlayerSpeed = 15;
 	m_pPlayer = std::unique_ptr<CImage>(new CImage(pDX2DFramework->GetD2DRenderTarget(), pDX2DFramework->GetImagingFactory(), 6));
 	m_pPlayer.get()->ManualLoadImage(hWnd, L"Images\\player%02d.png");
@@ -54,7 +54,7 @@ void BulletGame::Initialize(HWND hWnd, CDriect2DFramwork* pDX2DFramework)
 
 	m_pPlayerBoxCollider = std::unique_ptr<CBoxCollider>(new CBoxCollider());
 	m_pPlayerBoxCollider->InitCollider(m_pPlayerObject->GetTransformPtr(), SVector2(), m_pPlayer->GetImageSize());
-	
+
 	m_pNumberImage = std::shared_ptr<CImage>(new CImage(pDX2DFramework->GetD2DRenderTarget(), pDX2DFramework->GetImagingFactory(), 10));
 	m_pNumberImage->ManualLoadImage(hWnd, L"Images\\Number%d.png");
 
@@ -120,8 +120,8 @@ void BulletGame::Release()
 		delete obj;
 	}
 
-	_CrtSetReportMode(_CRT_WARN, _CRTDBG_MODE_DEBUG);
-	_CrtDumpMemoryLeaks();
+	//_CrtSetReportMode(_CRT_WARN, _CRTDBG_MODE_DEBUG);
+	//_CrtDumpMemoryLeaks();
 }
 
 void BulletGame::Update()
@@ -174,10 +174,11 @@ void BulletGame::Update()
 		}
 	}
 
-	if(isPlayerAlive) {
+	if (isPlayerAlive) {
 		for (CGameObject* gameObject : m_pGameObjects)
 		{
-			gameObject->GetTransform().Translate(SVector2::down() * 25);
+			if (gameObject->GetActive())
+				gameObject->GetTransform().Translate(SVector2::down() * 25);
 		}
 
 		std::random_device rd;
@@ -197,6 +198,15 @@ void BulletGame::Update()
 			catch (const std::exception& e) {
 				std::cout << "Caught an exception: " << e.what() << std::endl;
 				CDebugHelper::LogConsole("Bug %s", e.what());
+			}
+		}
+		else {
+			if (bulletIndex < 25) {
+				CGameObject* bulletObject = m_pGameObjects[bulletIndex];
+				bulletObject->SetActive(true);
+				bulletObject->GetTransform().SetTranslate(DX2DClasses::SVector2(dis(gen), 0));
+
+				++bulletIndex;
 			}
 		}
 
@@ -238,13 +248,17 @@ void BulletGame::Update()
 		CDebugHelper::LogConsole("\nGame Restarted\n");
 		CDebugHelper::LogConsole("\n[ !!!SURVIVE AS LONG AS YOU CAN!!! ]\n");
 
-		for (CRectCollider* rect : m_pRectColliders) {
-			delete rect;
-		}
-		m_pRectColliders.clear();
+		bulletIndex = 0;
+
+		//for (CRectCollider* rect : m_pRectColliders) {
+		//	delete rect;
+		//}
+		//m_pRectColliders.clear();
 		for (CGameObject* gameObject : m_pGameObjects) {
-			gameObject->Release();
-			delete gameObject;
+			gameObject->GetTransform().SetTranslate(DX2DClasses::SVector2(0, 0));
+			gameObject->SetActive(false);
+			//gameObject->Release();
+			//delete gameObject;
 		}
 		m_pGameObjects.clear();
 		score = 0;
@@ -263,7 +277,7 @@ void BulletGame::Draw()
 	ColliderDraw();
 	for (CGameObject* gameObject : m_pGameObjects)
 	{
-		if(gameObject->GetActive())
+		if (gameObject->GetActive())
 			gameObject->Draw();
 	}
 	m_pNumberObject0->Draw();
