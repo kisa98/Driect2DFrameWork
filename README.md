@@ -72,9 +72,15 @@ m_pNumberImage->ManualLoadImage(hWnd, L"Images\\Number%d.png");
    
 > 메모리 누수 감지 라이브러리를 이용한 메모리 누수 탐지
 ```C++
+
 #define _CRTDBG_MAP_ALLOC
 #include <stdlib.h>
 #include <crtdbg.h>
+
+...
+_CrtSetDbgFlag(_CRTDBG_ALLOC_MEM_DF | _CRTDBG_LEAK_CHECK_DF); //메모리 누수 검사
+...
+_CrtDumpMemoryLeaks();
 ```
 ```
 Detected memory leaks!
