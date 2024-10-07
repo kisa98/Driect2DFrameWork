@@ -70,7 +70,7 @@ m_pNumberImage = std::shared_ptr<CImage>(new CImage(pDX2DFramework->GetD2DRender
 m_pNumberImage->ManualLoadImage(hWnd, L"Images\\Number%d.png");
 ```
    
-> 메모리 누수 감지 라이브러리를 이용한 메모리 누수 탐지
+> C++의 메모리 누수 감지 라이브러리를 이용한 메모리 누수 탐지
 ```C++
 
 #define _CRTDBG_MAP_ALLOC
@@ -82,6 +82,8 @@ _CrtSetDbgFlag(_CRTDBG_ALLOC_MEM_DF | _CRTDBG_LEAK_CHECK_DF); //메모리 누수
 ...
 _CrtDumpMemoryLeaks();
 ```
+
+> 누수된 메모리가 발생한 부분을 탐지. 메모리 블럭이 콘솔에 출력됨.
 ```
 Detected memory leaks!
 Dumping objects ->
@@ -89,5 +91,6 @@ Dumping objects ->
  Data: <x   @           > 78 F9 1B 04 40 F5 1B 04 18 F6 1B 04 E0 FA 1B 04 
 {200} normal block at 0x04364220, 76 bytes long.
  Data: <( 7   7   7 H 7 > 28 E8 37 04 B8 E4 37 04 18 E6 37 04 48 E1 37 04
-```
+```  
+> 누수된 메모리가 발생한 부분에 중단점을 발생시켜 누수 발생 위치를 탐지함
 ![7](https://github.com/kisa98/Driect2DFrameWork/blob/master/Images/7.png?raw=true)
