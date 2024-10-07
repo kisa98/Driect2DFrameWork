@@ -45,9 +45,9 @@ namespace DX2DClasses
 
 		SVector2 m_vPos;
 
-		std::vector<CGameObject*> m_pGameObjects;
+		std::vector<CGameObject*> m_pBulletObjects;
 		std::vector<CImage*> m_pImages;
-		std::vector<CRectCollider*> m_pRectColliders;
+		std::vector<CRectCollider*> m_pBulletColliders;
 	public:
 		float m_fPlayerSpeed;
 		BulletGame();

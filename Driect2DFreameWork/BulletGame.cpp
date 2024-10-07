@@ -112,10 +112,10 @@ void BulletGame::Release()
 	m_pColorBrushPalettet->Release();
 	m_pColorBrushPalettet.release();
 
-	for (auto col : m_pRectColliders) {
+	for (auto col : m_pBulletColliders) {
 		delete col;
 	}
-	for (auto obj : m_pGameObjects) {
+	for (auto obj : m_pBulletObjects) {
 		obj->Release();
 		delete obj;
 	}
@@ -175,7 +175,7 @@ void BulletGame::Update()
 	}
 
 	if (isPlayerAlive) {
-		for (CGameObject* gameObject : m_pGameObjects)
+		for (CGameObject* gameObject : m_pBulletObjects)
 		{
 			if (gameObject->GetActive())
 				gameObject->GetTransform().Translate(SVector2::down() * 25);
@@ -184,7 +184,7 @@ void BulletGame::Update()
 		std::random_device rd;
 		std::mt19937 gen(rd());
 		std::uniform_int_distribution<> dis(1, 550);
-		if (m_pGameObjects.size() < 25) {
+		if (m_pBulletObjects.size() < 25) {
 			try {
 				CGameObject* bulletObject = new CGameObject();
 				bulletObject->Initialize(m_pBulletImage.get(), true);
@@ -192,8 +192,8 @@ void BulletGame::Update()
 				CRectCollider* bulletCollider = new CRectCollider();
 				bulletCollider->InitCollider(bulletObject->GetTransformPtr(), SVector2(), m_pBulletImage->GetImageSize());
 
-				m_pGameObjects.push_back(bulletObject);
-				m_pRectColliders.push_back(bulletCollider);
+				m_pBulletObjects.push_back(bulletObject);
+				m_pBulletColliders.push_back(bulletCollider);
 			}
 			catch (const std::exception& e) {
 				std::cout << "Caught an exception: " << e.what() << std::endl;
@@ -202,7 +202,7 @@ void BulletGame::Update()
 		}
 		else {
 			if (bulletIndex < 25) {
-				CGameObject* bulletObject = m_pGameObjects[bulletIndex];
+				CGameObject* bulletObject = m_pBulletObjects[bulletIndex];
 				bulletObject->SetActive(true);
 				bulletObject->GetTransform().SetTranslate(DX2DClasses::SVector2(dis(gen), 0));
 
@@ -219,7 +219,7 @@ void BulletGame::Update()
 			}
 		}*/
 
-		for (auto go : m_pGameObjects) {
+		for (auto go : m_pBulletObjects) {
 			if (go->GetTransform().GetTranslate().y > 550) {
 				go->GetTransform().SetTranslate(DX2DClasses::SVector2(dis(gen), 0));
 				++score;
@@ -254,13 +254,13 @@ void BulletGame::Update()
 		//	delete rect;
 		//}
 		//m_pRectColliders.clear();
-		for (CGameObject* gameObject : m_pGameObjects) {
+		for (CGameObject* gameObject : m_pBulletObjects) {
 			gameObject->GetTransform().SetTranslate(DX2DClasses::SVector2(0, 0));
 			gameObject->SetActive(false);
 			//gameObject->Release();
 			//delete gameObject;
 		}
-		m_pGameObjects.clear();
+		m_pBulletObjects.clear();
 		score = 0;
 		isPlayerAlive = true;
 		m_pPlayerObject->GetTransform().SetTranslate(DX2DClasses::SVector2(275, 500));
@@ -275,7 +275,7 @@ void BulletGame::Draw()
 	ID2D1HwndRenderTarget* pRenderTarget = CSingletonRenderTarget::GetRenderTarget();
 	m_pPlayerObject->Draw();
 	ColliderDraw();
-	for (CGameObject* gameObject : m_pGameObjects)
+	for (CGameObject* gameObject : m_pBulletObjects)
 	{
 		if (gameObject->GetActive())
 			gameObject->Draw();
@@ -293,9 +293,9 @@ void BulletGame::ColliderDraw() {
 
 	if (isPlayerAlive) {
 		int dist = -1;
-		for (auto it = m_pRectColliders.begin(); it != m_pRectColliders.end(); ++it) {
+		for (auto it = m_pBulletColliders.begin(); it != m_pBulletColliders.end(); ++it) {
 			if (m_pPlayerBoxCollider->ToRect(*it)) {
-				dist = std::distance(m_pRectColliders.begin(), it);
+				dist = std::distance(m_pBulletColliders.begin(), it);
 				break;
 			}
 		}
