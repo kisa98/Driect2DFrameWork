@@ -92,5 +92,6 @@ Dumping objects ->
 {200} normal block at 0x04364220, 76 bytes long.
  Data: <( 7   7   7 H 7 > 28 E8 37 04 B8 E4 37 04 18 E6 37 04 48 E1 37 04
 ```  
-> 누수된 메모리가 발생한 부분에 중단점을 발생시켜 누수 발생 위치를 탐지함
+> 누수된 메모리가 발생한 부분에 중단점을 발생시켜 누수 발생 위치를 탐지함  
 ![7](https://github.com/kisa98/Driect2DFrameWork/blob/master/Images/7.png?raw=true)
+
