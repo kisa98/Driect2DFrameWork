@@ -95,3 +95,43 @@ Dumping objects ->
 > 누수된 메모리가 발생한 부분에 중단점을 발생시켜 누수 발생 위치를 탐지함  
 ![7](https://github.com/kisa98/Driect2DFrameWork/blob/master/Images/7.png?raw=true)
 
+3. 메모리 풀링
+> 총알을 생성하고 소멸시키는 과정을 최적화하기 위해 리스트에 넣어 재활용함
+```
+if (m_pBulletObjects.size() < 25) {  //총알 25개까지
+	try {
+		CGameObject* bulletObject = new CGameObject();  //새로운 총알 오브젝트 생성
+		bulletObject->Initialize(m_pBulletImage.get(), true);
+		bulletObject->GetTransform().SetTranslate(DX2DClasses::SVector2(dis(gen), 0));
+		CRectCollider* bulletCollider = new CRectCollider();
+		bulletCollider->InitCollider(bulletObject->GetTransformPtr(), SVector2(), m_pBulletImage->GetImageSize());
+
+		m_pBulletObjects.push_back(bulletObject);  //총알 오브젝트를 리스트에 푸시
+		m_pBulletColliders.push_back(bulletCollider);
+	}
+	catch (const std::exception& e) {
+		std::cout << "Caught an exception: " << e.what() << std::endl;
+		CDebugHelper::LogConsole("Bug %s", e.what());
+	}
+}
+else {  //총알이 충분히 생성되었다면
+	if (bulletIndex < 25) {
+		CGameObject* bulletObject = m_pBulletObjects[bulletIndex];
+		bulletObject->SetActive(true);  //총알을 재활용
+		bulletObject->GetTransform().SetTranslate(DX2DClasses::SVector2(dis(gen), 0));
+
+		++bulletIndex;
+	}
+}
+```
+
+```
+for (CGameObject* gameObject : m_pBulletObjects) {
+  //기존의 총알 오브젝트를 파괴하고 재생성하는 로직을 수정
+	//gameObject->Release();
+	//delete gameObject;
+  //위치를 초기화하고 비활성화시켜 재활용할 준비
+	gameObject->GetTransform().SetTranslate(DX2DClasses::SVector2(0, 0));
+	gameObject->SetActive(false);
+}
+```
