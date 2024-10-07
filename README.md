@@ -13,6 +13,7 @@
 캐릭터의 충돌 박스가 총알의 충돌 박스에 부딪히면 게임 오버되며 스페이스 바 키를 눌러 게임을 재시작 할 수 있습니다.  
 ![6](https://github.com/kisa98/Driect2DFrameWork/blob/master/Images/6.png?raw=true)  
 좌상단에 점수가 표시됩니다.  
+계속된 도전을 통해 최고점에 도전해보세요!
 
 ## 프로젝트 목적
 - DirectX 코드 체험
@@ -25,3 +26,44 @@
 > BulletGame.h BulletGame.cpp  
 > DX2DClasses (Directory)
 
+## 코드
+1. Window API의 콜백 함수 구조를 이용한 게임 이벤트 시스템  
+> UNITY 이벤트 함수와 유사한 역할을 하는 함수들이 아래의 Window API의 메시지 처리 콜백 함수에서 작동함.
+```C++
+main.cpp
+void Initialize(HWND hWnd); //초기화 (UNITY의 Start()에 대응)
+void Update();              //프레임별 업데이트 (Update()에 대응)
+void Release();             //씬 파괴 (씬이 파괴될 때 호출하며, 각 객체에 포함된 OnDestroy()를 호출하여 메모리를 해제함)
+void Draw();                //그래픽 렌더링
+```
+
+```C++
+main.cpp
+LRESULT CALLBACK WindowProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
+{
+  ...
+  case WM_CREATE:
+    Initialize(hWnd);
+    break;
+  case WM_PAINT:
+    Update();
+    hdc = BeginPaint(hWnd, &ps);
+    Draw();
+  ...
+}
+```
+    
+2. 스마트포인터 사용
+> 동적 할당하는 객체를 안전하게 관리하기위해 C++의 STL인 스마트포인터를 활용함.
+```
+BulletGame.cpp
+...
+//단 하나만 존재하는 플레이어 게임오브젝트를 Unique Pointer로 관리
+m_pPlayerObject = std::unique_ptr<CGameObject>(new CGameObject());  
+m_pPlayerObject->Initialize(m_pPlayer.get(), true);
+
+...
+//점수 숫자 이미지를 Shared Pointer로 관리
+m_pNumberImage = std::shared_ptr<CImage>(new CImage(pDX2DFramework->GetD2DRenderTarget(), pDX2DFramework->GetImagingFactory(), 10)); 
+m_pNumberImage->ManualLoadImage(hWnd, L"Images\\Number%d.png");
+```
