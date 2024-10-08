@@ -97,7 +97,7 @@ Dumping objects ->
 
 3. 메모리 풀링
 > 총알을 생성하고 소멸시키는 과정을 최적화하기 위해 리스트에 넣어 재활용함
-```
+```C++
 if (m_pBulletObjects.size() < 25) {  //총알 25개까지
 	try {
 		CGameObject* bulletObject = new CGameObject();  //새로운 총알 오브젝트 생성
@@ -125,7 +125,7 @@ else {  //총알이 충분히 생성되었다면
 }
 ```
 
-```
+```C++
 for (CGameObject* gameObject : m_pBulletObjects) {
   //기존의 총알 오브젝트를 파괴하고 재생성하는 로직을 수정
 	//gameObject->Release();
